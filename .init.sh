@@ -108,6 +108,46 @@ if command -v asdf >/dev/null 2>&1; then
   asdf completion zsh >"${ASDF_DATA_DIR}/completions/_asdf" || warn "asdf completion gen failed"
 fi
 
+# ---------- asdf plugins & languages ----------
+if command -v asdf >/dev/null 2>&1; then
+  log "Configuring asdf plugins and languages"
+
+  add_plugin() {
+    local name="$1" url="$2"
+    if ! asdf plugin list | grep -q "^$name\$"; then
+      log "Adding asdf plugin: $name"
+      asdf plugin add "$name" "$url"
+    else
+      log "Plugin $name already added"
+    fi
+  }
+
+  # Add plugins
+  add_plugin nodejs https://github.com/asdf-vm/asdf-nodejs.git
+  add_plugin python https://github.com/asdf-community/asdf-python.git
+  add_plugin golang https://github.com/asdf-community/asdf-golang.git
+  add_plugin lua https://github.com/Stratus3D/asdf-lua.git
+
+  # Install latest versions & set global
+  for lang in nodejs python golang; do
+    latest="$(asdf latest "$lang" || true)"
+    if [[ -n "$latest" ]]; then
+      log "Installing $lang $latest"
+      asdf install "$lang" "$latest"
+      asdf set -u "$lang" "$latest"
+    else
+      warn "Could not determine latest version for $lang"
+    fi
+  done
+
+  asdf install lua 5.1.5
+  asdf set -u lua 5.1.5
+
+  asdf reshim
+else
+  warn "asdf not installed; skipping plugin setup"
+fi
+
 # ---------- rustup ----------
 if ! command -v rustup >/dev/null 2>&1; then
   log "Installing Rust toolchain via rustup"
@@ -177,7 +217,7 @@ overlay_dotfiles() {
 
 for entry in "$SCRIPT_DIR"/.* "$SCRIPT_DIR"/*; do
   name="$(basename "$entry")"
-  [[ "$name" == "." || "$name" == ".." || "$name" == ".init.sh" ]] && continue
+  [[ "$name" == "." || "$name" == ".." || "$name" == ".init.sh" || "$name" == ".git"]] && continue
   overlay_dotfiles "$name"
 done
 
