@@ -1,0 +1,81 @@
+# ~/.gitconfig
+[includeIf "gitdir:~/dev/l2l/"]
+  path = ~/.gitconfig-l2l
+
+[user]
+        name = Jay Ellis
+        email = jgellis206+dev@gmail.com
+        signingkey = /home/jellis/.ssh/id_ed25519_pers.pub
+[gpg]
+        format = ssh
+[rerere]
+        enabled = true
+[core]
+  editor = nvim
+        excludesfile = /home/jellis/.gitignore_global
+        autocrlf = input
+        eol = lf
+        sshCommand = /usr/bin/ssh
+[credential]
+  helper = cache
+[diff]
+  algorithm = patience
+        compactionHeuristic = true
+        tool = nvimdiff
+[difftool "nvimdiff"]
+        cmd = nvim -d $LOCAL $REMOTE -c 'wincmd w' -c 'wincmd L'
+[merge]
+        tool = nvimdiff4
+        prompt = false
+[mergetool "nvimdiff4"]
+        cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c 'wincmd w' -c 'wincmd J'
+[commit]
+  template = $HOME/.git_commit_template
+  verbose = true
+        gpgsign = true
+[push]
+        default = simple
+  autoSetupRemote = true
+[pull]
+  rebase = false
+[init]
+  defaultBranch = main
+[filter "lfs"]
+        smudge = git-lfs smudge -- %f
+        process = git-lfs filter-process
+        required = true
+        clean = git-lfs clean -- %f
+[tag]
+        forceSignAnnotated = false
+        gpgSign = true
+[alias]
+        co = checkout
+        br = branch
+        ci = commit
+        st = status
+        unstage = reset HEAD --
+        last = log -1 HEAD
+        rbi = rebase -i
+        fp = push -f
+        com = commit -m
+  cam = commit -a -m
+  p = pull
+  mt = mergetool
+  branch-name = "!git rev-parse --abbrev-ref HEAD"
+  publish = "!git push origin -u $(git branch-name)"
+  repush = "!git push origin :$(git branch-name) && git push -u origin $(git branch-name)"
+  originreset = "!git fetch origin; git reset  --hard origin/$(git branch-name)"
+
+
+[url "git@github.com-pers:"]
+        insteadOf = git@github.com:
+[url "ssh://git@github.com-pers/"]
+        insteadOf = https://github.com/
+[url "git@gitlab.com-pers:"]
+        insteadOf = git@gitlab.com:
+[url "ssh://git@gitlab.com-pers/"]
+        insteadOf = https://gitlab.com/
+[url "git@bitbucket.org-pers:"]
+        insteadOf = git@bitbucket.org:
+[url "ssh://git@bitbucket.org-pers/"]
+        insteadOf = https://bitbucket.org/

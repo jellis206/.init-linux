@@ -1,0 +1,184 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ---------- config ----------
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+OHMY_DIR="$HOME/.oh-my-zsh"
+ZSH_CUSTOM="${ZSH_CUSTOM:-$OHMY_DIR/custom}"
+LOCAL_BIN="$HOME/.local/bin"
+ASDF_DATA_DIR="${ASDF_DATA_DIR:-$HOME/.asdf}"
+
+log() { printf "[INFO] %s\n" "$*"; }
+warn() { printf "[WARN] %s\n" "$*" >&2; }
+die() {
+  printf "[ERROR] %s\n" "$*" >&2
+  exit 1
+}
+SUDO=""
+[[ $EUID -ne 0 ]] && SUDO="sudo"
+
+# ---------- apt base ----------
+$SUDO apt-get update -y
+$SUDO apt-get install -y zsh git curl unzip fzf zoxide ca-certificates
+
+# ---------- default shell ----------
+if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "/usr/bin/zsh" ]]; then
+  log "Changing default shell to zsh for $USER"
+  if ! $SUDO chsh -s /usr/bin/zsh "$USER"; then
+    warn "chsh failed (maybe no TTY). Run: chsh -s /usr/bin/zsh"
+  fi
+fi
+
+# ---------- ripgrep ----------
+if ! command -v rg >/dev/null 2>&1; then
+  log "Installing ripgrep"
+  $SUDO apt-get install -y ripgrep
+else
+  log "ripgrep already present: $(rg --version | head -n1)"
+fi
+
+# ---------- oh-my-zsh ----------
+if [[ ! -d "$OHMY_DIR" ]]; then
+  log "Installing Oh My Zsh"
+  RUNZSH=no KEEP_ZSHRC=yes \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+else
+  log "Oh My Zsh already present"
+fi
+
+# ---------- powerlevel10k & plugins ----------
+clone_if_missing() {
+  local repo="$1" dest="$2"
+  [[ -d "$dest" ]] || git clone --depth=1 "https://github.com/${repo}.git" "$dest"
+}
+clone_if_missing romkatv/powerlevel10k "$ZSH_CUSTOM/themes/powerlevel10k"
+clone_if_missing zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+clone_if_missing zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+clone_if_missing zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
+clone_if_missing zsh-users/zsh-history-substring-search "$ZSH_CUSTOM/plugins/zsh-history-substring-search"
+
+# ---------- JetBrainsMono Nerd Font ----------
+if ! fc-list | grep -qi 'JetBrainsMono Nerd Font'; then
+  log "Installing JetBrainsMono Nerd Font"
+  tmp="$(mktemp -d)"
+  curl -fsSL -o "$tmp/font.zip" \
+    https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip
+  mkdir -p "$HOME/.local/share/fonts"
+  unzip -q -o "$tmp/font.zip" -d "$HOME/.local/share/fonts"
+  fc-cache -f
+  rm -rf "$tmp"
+else
+  log "JetBrainsMono Nerd Font already installed"
+fi
+
+# ---------- asdf ----------
+if [ -z "${ASDF_VERSION:-}" ]; then
+  log "Fetching latest asdf version from GitHub"
+  ASDF_VERSION="$(curl -sL https://api.github.com/repos/asdf-vm/asdf/releases/latest |
+    grep '"tag_name":' | sed -E 's/.*"tag_name": *"v?([^"]+)".*/\1/')"
+  if [ -z "$ASDF_VERSION" ]; then
+    warn "Could not find latest asdf version; falling back to 0.18.0"
+    ASDF_VERSION="0.18.0"
+  else
+    log "Latest asdf version is $ASDF_VERSION"
+  fi
+fi
+
+mkdir -p "$LOCAL_BIN" "$ASDF_DATA_DIR/completions" "$ASDF_DATA_DIR/shims"
+ASDF_ARCH=""
+case "$(uname -m)" in
+aarch64 | arm64) ASDF_ARCH="arm64" ;;
+x86_64 | amd64) ASDF_ARCH="amd64" ;;
+*) die "Unsupported arch: $(uname -m)" ;;
+esac
+
+if ! command -v asdf >/dev/null 2>&1; then
+  log "Installing asdf v${ASDF_VERSION} (linux-${ASDF_ARCH})"
+  url="https://github.com/asdf-vm/asdf/releases/download/v${ASDF_VERSION}/asdf-v${ASDF_VERSION}-linux-${ASDF_ARCH}.tar.gz"
+  curl -fsSL "$url" -o /tmp/asdf.tar.gz
+  tar -xzf /tmp/asdf.tar.gz -C /tmp asdf
+  install -m 0755 /tmp/asdf "$LOCAL_BIN/asdf"
+  rm -f /tmp/asdf.tar.gz /tmp/asdf
+else
+  log "asdf already present: $({ asdf --version || true; } 2>/dev/null)"
+fi
+
+# asdf zsh completions
+if command -v asdf >/dev/null 2>&1; then
+  asdf completion zsh >"${ASDF_DATA_DIR}/completions/_asdf" || warn "asdf completion gen failed"
+fi
+
+# ---------- rustup ----------
+if ! command -v rustup >/dev/null 2>&1; then
+  log "Installing Rust toolchain via rustup"
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  export PATH="$HOME/.cargo/bin:$PATH"
+  rustup toolchain install stable
+  rustup default stable
+  rustup component add rust-analyzer clippy rustfmt
+else
+  log "rustup already present"
+fi
+
+# ---------- Neovim (latest from PPA) ----------
+if ! command -v nvim >/dev/null 2>&1; then
+  log "Installing Neovim from PPA"
+  $SUDO add-apt-repository ppa:neovim-ppa/unstable -y
+  $SUDO apt-get update -y
+  $SUDO apt-get install -y neovim
+else
+  log "Neovim already present: $(nvim --version | head -n1)"
+fi
+
+# ---------- Neovim config ----------
+NVIM_CONFIG="$HOME/.config/nvim"
+if [[ -d "$NVIM_CONFIG" ]]; then
+  log "Removing existing Neovim config at $NVIM_CONFIG"
+  rm -rf "$NVIM_CONFIG"
+fi
+
+log "Cloning Neovim config from repo"
+git clone git@github.com:jellis206/nvim.git "$NVIM_CONFIG"
+
+# ---------- lazygit ----------
+if ! command -v lazygit >/dev/null 2>&1; then
+  log "Installing lazygit via Go"
+  go install github.com/jesseduffield/lazygit@latest
+  # Ensure Go bin is in PATH
+  export PATH="$HOME/go/bin:$PATH"
+else
+  log "lazygit already present: $(lazygit --version 2>/dev/null | head -n1)"
+fi
+
+# ---------- overlay dotfiles ----------
+overlay_dotfiles() {
+  local subpath="$1"
+  local src="$SCRIPT_DIR/$subpath"
+  local dest="$HOME/$subpath"
+
+  if [[ -d "$src" ]]; then
+    log "Overlaying directory $src → $dest"
+    find "$src" -type f | while read -r file; do
+      rel="${file#$src/}"
+      target="$dest/$rel"
+      mkdir -p "$(dirname "$target")"
+      rm -f "$target"
+      cp "$file" "$target"
+      [[ "$subpath" == ".ssh"* ]] && chmod 600 "$target"
+      log "Installed $target"
+    done
+    [[ "$subpath" == ".ssh"* ]] && chmod 700 "$dest"
+  elif [[ -f "$src" ]]; then
+    log "Overlaying file $src → $dest"
+    rm -f "$dest"
+    cp "$src" "$dest"
+  fi
+}
+
+for entry in "$SCRIPT_DIR"/.* "$SCRIPT_DIR"/*; do
+  name="$(basename "$entry")"
+  [[ "$name" == "." || "$name" == ".." || "$name" == ".init.sh" ]] && continue
+  overlay_dotfiles "$name"
+done
+
+log "All set. Open a new terminal or run: exec zsh"

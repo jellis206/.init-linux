@@ -1,0 +1,19 @@
+# ~/.gitconfig-l2l
+# vim: filetype=gitconfig
+[user]
+        name = Jay Ellis
+        email = jay.ellis@l2l.com
+        signingkey = /Users/jayellis/.ssh/id_ed25519_l2l.pub
+
+[url "git@github.com-l2l:"]
+        insteadOf = git@github.com:
+[url "ssh://git@github.com-l2l/"]
+        insteadOf = https://github.com/
+[url "git@gitlab.com-l2l:"]
+        insteadOf = git@gitlab.com:
+[url "ssh://git@gitlab.com-l2l/"]
+        insteadOf = https://gitlab.com/
+[url "git@bitbucket.org-l2l:"]
+        insteadOf = git@bitbucket.org:
+[url "ssh://git@bitbucket.org-l2l/"]
+        insteadOf = https://bitbucket.org/
