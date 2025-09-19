@@ -149,16 +149,16 @@ else
 fi
 
 # ---------- rustup ----------
-if ! command -v rustup >/dev/null 2>&1; then
-  log "Installing Rust toolchain via rustup"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-  export PATH="$HOME/.cargo/bin:$PATH"
-  rustup toolchain install stable
-  rustup default stable
-  rustup component add rust-analyzer clippy rustfmt
-else
-  log "rustup already present"
-fi
+# if ! command -v rustup >/dev/null 2>&1; then
+#   log "Installing Rust toolchain via rustup"
+#   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+#   export PATH="$HOME/.cargo/bin:$PATH"
+#   rustup toolchain install stable
+#   rustup default stable
+#   rustup component add rust-analyzer clippy rustfmt
+# else
+#   log "rustup already present"
+# fi
 
 # ---------- Neovim (latest from PPA) ----------
 if ! command -v nvim >/dev/null 2>&1; then
