@@ -19,10 +19,20 @@ source "$ZSH/oh-my-zsh.sh"
 [[ -f "$ZSH/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && source "$ZSH/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # asdf modern setup: PATH shims first; add completions to fpath
-export ASDF_DATA_DIR="${ASDF_DATA_DIR:-$HOME/.asdf}"
-export PATH="$HOME/go/bin:$HOME/.cargo/bin:$ASDF_DATA_DIR/shims:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
-fpath=($ASDF_DATA_DIR/completions $fpath)
-autoload -Uz compinit && compinit
+path=(
+  $HOME/go/bin
+  $HOME/.cargo/bin
+  $ASDF_DATA_DIR/shims
+  $HOME/.local/bin
+  /usr/local/bin
+  /usr/bin
+  /bin
+  /usr/sbin
+  /sbin
+)
+# Deduplicate & validate
+typeset -U path
+export PATH
 
 # zoxide (smarter cd)
 if command -v zoxide >/dev/null 2>&1; then
@@ -45,3 +55,15 @@ for file in $HOME/.env-vars/*.{zsh,sh}; do [ -r "$file" ] && source "$file"; don
 for file in $HOME/.sh-functions/*.{zsh,sh}; do [ -r "$file" ] && source "$file"; done
 for file in $HOME/.sh-aliases/*.{zsh,sh}; do [ -r "$file" ] && source "$file"; done
 unsetopt null_glob
+
+# remove duplicate entries in PATH
+export PATH=$(echo "$PATH" | awk -v RS=':' '{
+    # First normalize any multiple slashes to single slashes
+    gsub("//+","/")
+    # Then do the deduplication check
+    if (!($0 in a)) {
+        a[$0]
+        printf("%s%s", sep, $0)
+        sep=":"
+    }
+}')
