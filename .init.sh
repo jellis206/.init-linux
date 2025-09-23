@@ -162,8 +162,8 @@ fi
 
 # ---------- Neovim (latest from PPA) ----------
 if ! command -v nvim >/dev/null 2>&1; then
-  log "Installing Neovim from PPA"
-  $SUDO add-apt-repository ppa:neovim-ppa/unstable -y
+  log "Installing Neovim from stable PPA"
+  $SUDO add-apt-repository ppa:neovim-ppa/stable -y
   $SUDO apt-get update -y
   $SUDO apt-get install -y neovim
 else
