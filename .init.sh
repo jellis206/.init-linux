@@ -217,7 +217,11 @@ overlay_dotfiles() {
 
 for entry in "$SCRIPT_DIR"/.* "$SCRIPT_DIR"/*; do
   name="$(basename "$entry")"
-  [[ "$name" == "." || "$name" == ".." || "$name" == ".init.sh" || "$name" == ".git"]] && continue
+  case "$name" in
+    .|..|.init.sh|.git)
+      continue
+      ;;
+  esac
   overlay_dotfiles "$name"
 done
 
