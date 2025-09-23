@@ -1,6 +1,6 @@
 # ~/.gitconfig
 [includeIf "gitdir:~/dev/l2l/"]
-  path = ~/.gitconfig-l2l
+  	path = ~/.gitconfig-l2l
 
 [user]
         name = Jay Ellis
@@ -11,15 +11,15 @@
 [rerere]
         enabled = true
 [core]
-  editor = nvim
+  	editor = nvim
         excludesfile = /home/jellis/.gitignore_global
         autocrlf = input
         eol = lf
         sshCommand = /usr/bin/ssh
 [credential]
-  helper = cache
+  	helper = cache
 [diff]
-  algorithm = patience
+  	algorithm = patience
         compactionHeuristic = true
         tool = nvimdiff
 [difftool "nvimdiff"]
@@ -30,16 +30,16 @@
 [mergetool "nvimdiff4"]
         cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c 'wincmd w' -c 'wincmd J'
 [commit]
-  template = $HOME/.git_commit_template
-  verbose = true
+  	template = $HOME/.git_commit_template
+  	verbose = true
         gpgsign = true
 [push]
         default = simple
-  autoSetupRemote = true
+  	autoSetupRemote = true
 [pull]
-  rebase = false
+  	rebase = false
 [init]
-  defaultBranch = main
+  	defaultBranch = main
 [filter "lfs"]
         smudge = git-lfs smudge -- %f
         process = git-lfs filter-process
@@ -58,13 +58,13 @@
         rbi = rebase -i
         fp = push -f
         com = commit -m
-  cam = commit -a -m
-  p = pull
-  mt = mergetool
-  branch-name = "!git rev-parse --abbrev-ref HEAD"
-  publish = "!git push origin -u $(git branch-name)"
-  repush = "!git push origin :$(git branch-name) && git push -u origin $(git branch-name)"
-  originreset = "!git fetch origin; git reset  --hard origin/$(git branch-name)"
+  	cam = commit -a -m
+  	p = pull
+  	mt = mergetool
+  	branch-name = "!git rev-parse --abbrev-ref HEAD"
+  	publish = "!git push origin -u $(git branch-name)"
+  	repush = "!git push origin :$(git branch-name) && git push -u origin $(git branch-name)"
+  	originreset = "!git fetch origin; git reset  --hard origin/$(git branch-name)"
 
 
 [url "git@github.com-pers:"]
