@@ -21,7 +21,7 @@ SUDO=""
 $SUDO apt-get update -y
 $SUDO apt-get install -y \
   zsh git curl unzip fzf zoxide ca-certificates ripgrep \
-  libreadline-dev libncurses-dev build-essential
+  libreadline-dev libncurses-dev build-essential clangd
 
 
 # ---------- default shell ----------
