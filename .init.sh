@@ -19,7 +19,10 @@ SUDO=""
 
 # ---------- apt base ----------
 $SUDO apt-get update -y
-$SUDO apt-get install -y zsh git curl unzip fzf zoxide ca-certificates
+$SUDO apt-get install -y \
+  zsh git curl unzip fzf zoxide ca-certificates ripgrep \
+  libreadline-dev libncurses5-dev libncurses-dev libncursesw-dev build-essential
+
 
 # ---------- default shell ----------
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "/usr/bin/zsh" ]]; then
@@ -27,14 +30,6 @@ if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "/usr/bin/zsh" ]]; then
   if ! $SUDO chsh -s /usr/bin/zsh "$USER"; then
     warn "chsh failed (maybe no TTY). Run: chsh -s /usr/bin/zsh"
   fi
-fi
-
-# ---------- ripgrep ----------
-if ! command -v rg >/dev/null 2>&1; then
-  log "Installing ripgrep"
-  $SUDO apt-get install -y ripgrep
-else
-  log "ripgrep already present: $(rg --version | head -n1)"
 fi
 
 # ---------- oh-my-zsh ----------
