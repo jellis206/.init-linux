@@ -71,7 +71,7 @@ fi
 if [ -z "${ASDF_VERSION:-}" ]; then
   log "Fetching latest asdf version from GitHub"
   ASDF_VERSION="$(curl -sL https://api.github.com/repos/asdf-vm/asdf/releases/latest |
-    grep '"tag_name":' | sed -E 's/.*"tag_name": *"v?([^"]+)".*/\1/')"
+    /usr/bin/rg '"tag_name":' | sed -E 's/.*"tag_name": *"v?([^"]+)".*/\1/')"
   if [ -z "$ASDF_VERSION" ]; then
     warn "Could not find latest asdf version; falling back to 0.18.0"
     ASDF_VERSION="0.18.0"
@@ -110,7 +110,7 @@ if command -v asdf >/dev/null 2>&1; then
 
   add_plugin() {
     local name="$1" url="$2"
-    if ! asdf plugin list | grep -q "^$name\$"; then
+    if ! asdf plugin list | /usr/bin/rg -q "^$name\$"; then
       log "Adding asdf plugin: $name"
       asdf plugin add "$name" "$url"
     else
@@ -204,6 +204,22 @@ if ! command -v lazygit >/dev/null 2>&1; then
   export PATH="$HOME/go/bin:$PATH"
 else
   log "lazygit already present: $(lazygit --version 2>/dev/null | head -n1)"
+fi
+
+# ---------- tmux & TPM ----------
+if ! command -v tmux >/dev/null 2>&1; then
+  log "Installing tmux"
+  $SUDO apt-get install -y tmux
+else
+  log "tmux already present: $(tmux -V)"
+fi
+
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+if [[ ! -d "$TPM_DIR" ]]; then
+  log "Installing Tmux Plugin Manager (TPM)"
+  git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
+else
+  log "TPM already present at $TPM_DIR"
 fi
 
 # ---------- overlay dotfiles ----------
