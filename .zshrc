@@ -49,11 +49,30 @@ export SAVEHIST=2000
 export HISTFILE="$HOME/.zsh_history"
 setopt SHARE_HISTORY AUTO_CD NO_CASE_GLOB HIST_IGNORE_DUPS COMPLETE_ALIASES
 
-# Your custom files (optional)
 setopt null_glob
-for file in $HOME/.env-vars/*.{zsh,sh}; do [ -r "$file" ] && source "$file"; done
-for file in $HOME/.sh-functions/*.{zsh,sh}; do [ -r "$file" ] && source "$file"; done
-for file in $HOME/.sh-aliases/*.{zsh,sh}; do [ -r "$file" ] && source "$file"; done
+# Environment variables
+if [[ -d "$HOME/.env-vars" ]]; then
+  for file in "$HOME"/.env-vars/*.{zsh,sh}; do
+    [[ -e "$file" ]] || continue
+    [ -r "$file" ] && source "$file"
+  done
+fi
+
+# Functions
+if [[ -d "$HOME/.sh-functions" ]]; then
+  for file in "$HOME"/.sh-functions/*.{zsh,sh}; do
+    [[ -e "$file" ]] || continue
+    [ -r "$file" ] && source "$file"
+  done
+fi
+
+# Aliases
+if [[ -d "$HOME/.sh-aliases" ]]; then
+  for file in "$HOME"/.sh-aliases/*.{zsh,sh}; do
+    [[ -e "$file" ]] || continue
+    [ -r "$file" ] && source "$file"
+  done
+fi
 unsetopt null_glob
 
 # remove duplicate entries in PATH
