@@ -234,27 +234,30 @@ overlay_dotfiles() {
       rel="${file#$src/}"
       target="$dest/$rel"
       mkdir -p "$(dirname "$target")"
-      rm -f "$target"
-      cp "$file" "$target"
+      cp -f "$file" "$target"
       [[ "$subpath" == ".ssh"* ]] && chmod 600 "$target"
       log "Installed $target"
     done
     [[ "$subpath" == ".ssh"* ]] && chmod 700 "$dest"
   elif [[ -f "$src" ]]; then
     log "Overlaying file $src → $dest"
-    rm -f "$dest"
-    cp "$src" "$dest"
+    cp -f "$src" "$dest"
+    log "Installed $dest"
+  else
+    warn "Skipping $subpath (not found)"
   fi
 }
 
-for entry in "$SCRIPT_DIR"/.* "$SCRIPT_DIR"/*; do
+# loop over repo contents
+shopt -s dotglob nullglob  # <-- ensure hidden files like .tmux.conf are included
+for entry in "$SCRIPT_DIR"/*; do
   name="$(basename "$entry")"
   case "$name" in
-    .|..|.init.sh|.git)
-      continue
-      ;;
+    .init.sh|.git) continue ;;
   esac
   overlay_dotfiles "$name"
 done
+shopt -u dotglob nullglob
+
 
 log "All set. Open a new terminal or run: exec zsh"
