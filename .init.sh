@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -euo
 
 # ---------- config ----------
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -19,7 +19,10 @@ SUDO=""
 
 # ---------- apt base ----------
 $SUDO apt-get update -y
-$SUDO apt-get install -y zsh git curl unzip fzf zoxide ca-certificates
+$SUDO apt-get install -y \
+  zsh git curl unzip fzf zoxide ca-certificates ripgrep \
+  libreadline-dev libncurses-dev build-essential clangd
+
 
 # ---------- default shell ----------
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "/usr/bin/zsh" ]]; then
@@ -27,14 +30,6 @@ if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "/usr/bin/zsh" ]]; then
   if ! $SUDO chsh -s /usr/bin/zsh "$USER"; then
     warn "chsh failed (maybe no TTY). Run: chsh -s /usr/bin/zsh"
   fi
-fi
-
-# ---------- ripgrep ----------
-if ! command -v rg >/dev/null 2>&1; then
-  log "Installing ripgrep"
-  $SUDO apt-get install -y ripgrep
-else
-  log "ripgrep already present: $(rg --version | head -n1)"
 fi
 
 # ---------- oh-my-zsh ----------
@@ -76,7 +71,7 @@ fi
 if [ -z "${ASDF_VERSION:-}" ]; then
   log "Fetching latest asdf version from GitHub"
   ASDF_VERSION="$(curl -sL https://api.github.com/repos/asdf-vm/asdf/releases/latest |
-    grep '"tag_name":' | sed -E 's/.*"tag_name": *"v?([^"]+)".*/\1/')"
+    /usr/bin/rg '"tag_name":' | sed -E 's/.*"tag_name": *"v?([^"]+)".*/\1/')"
   if [ -z "$ASDF_VERSION" ]; then
     warn "Could not find latest asdf version; falling back to 0.18.0"
     ASDF_VERSION="0.18.0"
@@ -115,7 +110,7 @@ if command -v asdf >/dev/null 2>&1; then
 
   add_plugin() {
     local name="$1" url="$2"
-    if ! asdf plugin list | grep -q "^$name\$"; then
+    if ! asdf plugin list | /usr/bin/rg -q "^$name\$"; then
       log "Adding asdf plugin: $name"
       asdf plugin add "$name" "$url"
     else
@@ -130,7 +125,7 @@ if command -v asdf >/dev/null 2>&1; then
   add_plugin lua https://github.com/Stratus3D/asdf-lua.git
 
   # Install latest versions & set global
-  for lang in nodejs python golang; do
+  for lang in nodejs golang; do
     latest="$(asdf latest "$lang" || true)"
     if [[ -n "$latest" ]]; then
       log "Installing $lang $latest"
@@ -161,15 +156,35 @@ fi
 #   log "rustup already present"
 # fi
 
-# ---------- neovim stable ----------
-if ! command -v nvim >/dev/null 2>&1; then
-  log "Installing Neovim from stable PPA"
-  $SUDO add-apt-repository ppa:neovim-ppa/stable -y
-  $SUDO apt-get update -y
-  $SUDO apt-get install -y neovim
-else
-  log "Neovim already present: $(nvim --version | head -n1)"
-fi
+# ---------- neovim (latest stable from GitHub) ----------
+log "Checking latest stable Neovim release"
+
+arch="$(uname -m)"
+case "$arch" in
+  x86_64|amd64)   asset="nvim-linux-x86_64.tar.gz" ;;
+  aarch64|arm64)  asset="nvim-linux-arm64.tar.gz" ;;
+  *) die "Unsupported arch for Neovim: $arch" ;;
+esac
+
+tmp="$(mktemp -d)"
+url="https://github.com/neovim/neovim/releases/latest/download/$asset"
+
+log "Downloading $url"
+curl -fsSL -o "$tmp/nvim.tar.gz" "$url"
+
+# extract into ~/.local
+rm -rf "$HOME/.local/nvim"
+tar -xzf "$tmp/nvim.tar.gz" -C "$tmp"
+extracted_dir="$(tar -tzf "$tmp/nvim.tar.gz" | head -1 | cut -f1 -d"/")"
+mv "$tmp/$extracted_dir" "$HOME/.local/nvim"
+
+# symlink into ~/.local/bin
+mkdir -p "$HOME/.local/bin"
+ln -sf "$HOME/.local/nvim/bin/nvim" "$HOME/.local/bin/nvim"
+
+rm -rf "$tmp"
+
+log "Installed Neovim: $($HOME/.local/bin/nvim --version | head -n1)"
 
 # ---------- Neovim config ----------
 NVIM_CONFIG="$HOME/.config/nvim"
@@ -189,6 +204,22 @@ if ! command -v lazygit >/dev/null 2>&1; then
   export PATH="$HOME/go/bin:$PATH"
 else
   log "lazygit already present: $(lazygit --version 2>/dev/null | head -n1)"
+fi
+
+# ---------- tmux & TPM ----------
+if ! command -v tmux >/dev/null 2>&1; then
+  log "Installing tmux"
+  $SUDO apt-get install -y tmux
+else
+  log "tmux already present: $(tmux -V)"
+fi
+
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+if [[ ! -d "$TPM_DIR" ]]; then
+  log "Installing Tmux Plugin Manager (TPM)"
+  git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
+else
+  log "TPM already present at $TPM_DIR"
 fi
 
 # ---------- overlay dotfiles ----------
