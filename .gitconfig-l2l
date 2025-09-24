@@ -3,7 +3,7 @@
 [user]
 	name = Jay Ellis
 	email = jay.ellis@l2l.com
-	signingkey = /Users/jayellis/.ssh/id_ed25519_l2l.pub
+	signingkey = /home/jellis/.ssh/id_ed25519_l2l.pub
 
 [url "git@github.com-l2l:"]
 	insteadOf = git@github.com:
