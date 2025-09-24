@@ -172,19 +172,19 @@ url="https://github.com/neovim/neovim/releases/latest/download/$asset"
 log "Downloading $url"
 curl -fsSL -o "$tmp/nvim.tar.gz" "$url"
 
-# remove old install & expand new one
-$SUDO rm -rf /opt/nvim
+# extract into ~/.local
+rm -rf "$HOME/.local/nvim"
 tar -xzf "$tmp/nvim.tar.gz" -C "$tmp"
-
 extracted_dir="$(tar -tzf "$tmp/nvim.tar.gz" | head -1 | cut -f1 -d"/")"
-$SUDO mv "$tmp/$extracted_dir" /opt/nvim
+mv "$tmp/$extracted_dir" "$HOME/.local/nvim"
 
-# ensure global symlink
-$SUDO ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+# symlink into ~/.local/bin
+mkdir -p "$HOME/.local/bin"
+ln -sf "$HOME/.local/nvim/bin/nvim" "$HOME/.local/bin/nvim"
 
 rm -rf "$tmp"
 
-log "Installed Neovim: $(/usr/local/bin/nvim --version | head -n1)"
+log "Installed Neovim: $($HOME/.local/bin/nvim --version | head -n1)"
 
 # ---------- Neovim config ----------
 NVIM_CONFIG="$HOME/.config/nvim"
