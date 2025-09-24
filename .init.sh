@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -euo
 
 # ---------- config ----------
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -22,7 +21,6 @@ $SUDO apt-get update -y
 $SUDO apt-get install -y \
   zsh git curl unzip fzf zoxide ca-certificates ripgrep \
   libreadline-dev libncurses-dev build-essential clangd
-
 
 # ---------- default shell ----------
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "/usr/bin/zsh" ]]; then
@@ -161,9 +159,9 @@ log "Checking latest stable Neovim release"
 
 arch="$(uname -m)"
 case "$arch" in
-  x86_64|amd64)   asset="nvim-linux-x86_64.tar.gz" ;;
-  aarch64|arm64)  asset="nvim-linux-arm64.tar.gz" ;;
-  *) die "Unsupported arch for Neovim: $arch" ;;
+x86_64 | amd64) asset="nvim-linux-x86_64.tar.gz" ;;
+aarch64 | arm64) asset="nvim-linux-arm64.tar.gz" ;;
+*) die "Unsupported arch for Neovim: $arch" ;;
 esac
 
 tmp="$(mktemp -d)"
@@ -249,11 +247,11 @@ overlay_dotfiles() {
 }
 
 # loop over repo contents
-shopt -s dotglob nullglob  # <-- ensure hidden files like .tmux.conf are included
+shopt -s dotglob nullglob # <-- ensure hidden files like .tmux.conf are included
 for entry in "$SCRIPT_DIR"/*; do
   name="$(basename "$entry")"
   case "$name" in
-    .init.sh|.git) continue ;;
+  .init.sh | .git) continue ;;
   esac
   overlay_dotfiles "$name"
 done
