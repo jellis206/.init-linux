@@ -1,14 +1,16 @@
 # ~/.gitconfig
-
 [includeIf "gitdir:/home/jellis/dev/l2l/"]
   path = /home/jellis/.gitconfig-l2l
+
 
 [user]
 	name = Jay Ellis
 	email = jgellis206+dev@gmail.com
 	signingkey = /home/jellis/.ssh/id_ed25519_pers.pub
 [gpg]
-	format = ssh
+  format = ssh
+[gpg "ssh"]
+  allowedSignersFile = ~/.ssh/allowed_signers
 [rerere]
 	enabled = true
 [core]
