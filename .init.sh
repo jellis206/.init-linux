@@ -161,7 +161,7 @@ fi
 #   log "rustup already present"
 # fi
 
-# ---------- Neovim (latest from PPA) ----------
+# ---------- neovim stable ----------
 if ! command -v nvim >/dev/null 2>&1; then
   log "Installing Neovim from stable PPA"
   $SUDO add-apt-repository ppa:neovim-ppa/stable -y
