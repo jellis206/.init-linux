@@ -229,7 +229,7 @@ overlay_dotfiles() {
   if [[ -d "$src" ]]; then
     log "Overlaying directory $src → $dest"
     find "$src" -type f | while read -r file; do
-      rel="${file#$src/}"
+      rel="${file#"$src"/}"
       target="$dest/$rel"
       mkdir -p "$(dirname "$target")"
       cp -f "$file" "$target"
@@ -247,14 +247,12 @@ overlay_dotfiles() {
 }
 
 # loop over repo contents
-shopt -s dotglob nullglob # <-- ensure hidden files like .tmux.conf are included
-for entry in "$SCRIPT_DIR"/*; do
+for entry in "$SCRIPT_DIR"/.* "$SCRIPT_DIR"/*; do
   name="$(basename "$entry")"
   case "$name" in
-  .init.sh | .git) continue ;;
+  . | .. | .init.sh | .git) continue ;;
   esac
   overlay_dotfiles "$name"
 done
-shopt -u dotglob nullglob
 
 log "All set. Open a new terminal or run: exec zsh"
