@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail -x
+set -euo
 
 # ---------- config ----------
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
