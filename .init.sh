@@ -156,15 +156,36 @@ fi
 #   log "rustup already present"
 # fi
 
-# ---------- neovim stable ----------
-if ! command -v nvim >/dev/null 2>&1; then
-  log "Installing Neovim from stable PPA"
-  $SUDO add-apt-repository ppa:neovim-ppa/stable -y
-  $SUDO apt-get update -y
-  $SUDO apt-get install -y neovim
-else
-  log "Neovim already present: $(nvim --version | head -n1)"
-fi
+# ---------- neovim (latest stable from GitHub) ----------
+log "Checking latest stable Neovim release"
+
+arch="$(uname -m)"
+case "$arch" in
+  x86_64|amd64)   asset="nvim-linux-x86_64.tar.gz" ;;
+  aarch64|arm64)  asset="nvim-linux-arm64.tar.gz" ;;
+  *) die "Unsupported arch for Neovim: $arch" ;;
+esac
+
+tmp="$(mktemp -d)"
+url="https://github.com/neovim/neovim/releases/latest/download/$asset"
+
+log "Downloading $url"
+curl -fsSL -o "$tmp/nvim.tar.gz" "$url"
+
+# remove old install & expand new one
+$SUDO rm -rf /opt/nvim
+$SUDO tar -C /opt -xzf "$tmp/nvim.tar.gz"
+# tarball unpacks as nvim-linux-<arch>
+extracted_dir="$(tar -tzf "$tmp/nvim.tar.gz" | head -1 | cut -f1 -d"/")"
+$SUDO mv "/opt/$extracted_dir" /opt/nvim
+
+# ensure global symlink
+$SUDO ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+
+rm -rf "$tmp"
+
+log "Installed Neovim: $(/usr/local/bin/nvim --version | head -n1)"
+
 
 # ---------- Neovim config ----------
 NVIM_CONFIG="$HOME/.config/nvim"
