@@ -1,6 +1,6 @@
 # ~/.gitconfig
 
-[includeIf "gitdir:/Users/jayellis/projects/l2l/"]
+[includeIf "gitdir:/home/jellis/projects/l2l/"]
   path = /home/jellis/.gitconfig-l2l
 
 [user]
