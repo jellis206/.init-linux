@@ -259,5 +259,4 @@ for entry in "$SCRIPT_DIR"/*; do
 done
 shopt -u dotglob nullglob
 
-
 log "All set. Open a new terminal or run: exec zsh"
