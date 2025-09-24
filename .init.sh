@@ -130,7 +130,7 @@ if command -v asdf >/dev/null 2>&1; then
   add_plugin lua https://github.com/Stratus3D/asdf-lua.git
 
   # Install latest versions & set global
-  for lang in nodejs python golang; do
+  for lang in nodejs golang; do
     latest="$(asdf latest "$lang" || true)"
     if [[ -n "$latest" ]]; then
       log "Installing $lang $latest"
