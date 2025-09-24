@@ -58,13 +58,14 @@ clone_if_missing zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
 clone_if_missing zsh-users/zsh-history-substring-search "$ZSH_CUSTOM/plugins/zsh-history-substring-search"
 
 # ---------- JetBrainsMono Nerd Font ----------
-if ! fc-list | grep -qi 'JetBrainsMono Nerd Font'; then
+FONT_DIR="$HOME/.local/share/fonts/JetBrainsMono"
+if [[ ! -d "$FONT_DIR" || -z "$(ls -A "$FONT_DIR"/*.ttf 2>/dev/null)" ]]; then
   log "Installing JetBrainsMono Nerd Font"
   tmp="$(mktemp -d)"
   curl -fsSL -o "$tmp/font.zip" \
     https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip
-  mkdir -p "$HOME/.local/share/fonts"
-  unzip -q -o "$tmp/font.zip" -d "$HOME/.local/share/fonts"
+  mkdir -p "$FONT_DIR"
+  unzip -q -o "$tmp/font.zip" -d "$FONT_DIR"
   fc-cache -f
   rm -rf "$tmp"
 else
