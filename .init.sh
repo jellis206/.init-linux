@@ -154,9 +154,7 @@ fi
 #   log "rustup already present"
 # fi
 
-# ---------- neovim (latest stable from GitHub) ----------
-log "Checking latest stable Neovim release"
-
+# ---------- neovim ----------
 arch="$(uname -m)"
 case "$arch" in
 x86_64 | amd64) asset="nvim-linux-x86_64.tar.gz" ;;
@@ -165,7 +163,7 @@ aarch64 | arm64) asset="nvim-linux-arm64.tar.gz" ;;
 esac
 
 tmp="$(mktemp -d)"
-url="https://github.com/neovim/neovim/releases/latest/download/$asset"
+url="https://github.com/neovim/neovim/releases/download/nightly/$asset"
 
 log "Downloading $url"
 curl -fsSL -o "$tmp/nvim.tar.gz" "$url"
