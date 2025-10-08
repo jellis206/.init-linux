@@ -218,6 +218,15 @@ else
   log "TPM already present at $TPM_DIR"
 fi
 
+# ---------- install Claude Code with npm ----------
+if ! command -v claude-code >/dev/null 2>&1; then
+  log "Installing Claude Code"
+  sudo npm install -g claude-code
+  log "Claude Code installed"
+else
+  log "Claude Code already installed"
+fi
+
 # ---------- overlay dotfiles ----------
 overlay_dotfiles() {
   local subpath="$1"
