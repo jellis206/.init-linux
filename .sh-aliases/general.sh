@@ -9,8 +9,8 @@ alias -g px='pnpm exec'
 alias -g pxply='pnpm exec playwright'
 alias -g mmdc='npx mmdc'
 alias -g vim='nvim'
-alias -g nx='npx nx'
-alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias -g fd='fdfind'
+alias -g dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # git aliases
 alias -g gst='git status'

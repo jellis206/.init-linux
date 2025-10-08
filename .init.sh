@@ -19,7 +19,7 @@ SUDO=""
 # ---------- apt base ----------
 $SUDO apt-get update -y
 $SUDO apt-get install -y \
-  zsh git curl unzip fzf zoxide ca-certificates ripgrep \
+  zsh git curl unzip fzf zoxide ca-certificates ripgrep fd-find \
   libreadline-dev libncurses-dev build-essential clangd
 
 # ---------- default shell ----------
