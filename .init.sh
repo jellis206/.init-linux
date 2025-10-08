@@ -20,7 +20,7 @@ SUDO=""
 $SUDO apt-get update -y
 $SUDO apt-get install -y \
   zsh git curl unzip fzf zoxide ca-certificates ripgrep fd-find \
-  libreadline-dev libncurses-dev build-essential clangd
+  xclip libreadline-dev libncurses-dev build-essential clangd
 
 # ---------- default shell ----------
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "/usr/bin/zsh" ]]; then
