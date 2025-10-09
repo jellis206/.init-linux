@@ -198,6 +198,8 @@ git clone git@github.com:jellis206/nvim.git "$NVIM_CONFIG"
 curl -L https://raw.githubusercontent.com/mpeterv/hererocks/master/hererocks.py -o ~/.local/bin/hererocks
 # Make it executable
 chmod +x ~/.local/bin/hererocks
+# Setup hererocks
+hererocks ~/.local/share/nvim/lazy-rocks/hererocks -l 5.1 -r latest -v
 
 # ---------- lazygit ----------
 if ! command -v lazygit >/dev/null 2>&1; then

@@ -22,7 +22,10 @@ source "$ZSH/oh-my-zsh.sh"
 path=(
   $HOME/go/bin
   $HOME/.cargo/bin
-  $ASDF_DATA_DIR/shims
+  $HOME/.asdf/completions
+  $HOME/.asdf/downloads
+  $HOME/.asdf/installs
+  $HOME/.asdf/shims
   $HOME/.local/bin
   /usr/local/bin
   /usr/bin
