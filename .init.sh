@@ -201,8 +201,11 @@ chmod +x ~/.local/bin/hererocks
 # Setup hererocks
 hererocks ~/.local/share/nvim/lazy-rocks/hererocks -l 5.1 -r latest -v
 
-sudo apt install -y texlive-full latext2text
+sudo apt install -y texlive-full latext2text imagemagick ghostscript graphviz
 pip install pylatexenc
+pip install --upgrade pip pynvim
+npm install -g neovim
+npm install -g @mermaid-js/mermaid-cli
 
 # ---------- lazygit ----------
 if ! command -v lazygit >/dev/null 2>&1; then
