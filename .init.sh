@@ -142,6 +142,8 @@ else
   warn "asdf not installed; skipping plugin setup"
 fi
 
+sudo ln -s /usr/bin/python3 /usr/local/bin/python
+
 # ---------- rustup ----------
 # if ! command -v rustup >/dev/null 2>&1; then
 #   log "Installing Rust toolchain via rustup"
@@ -191,6 +193,11 @@ fi
 
 log "Cloning Neovim config from repo"
 git clone git@github.com:jellis206/nvim.git "$NVIM_CONFIG"
+
+# Download hererocks directly from its GitHub
+curl -L https://raw.githubusercontent.com/mpeterv/hererocks/master/hererocks.py -o ~/.local/bin/hererocks
+# Make it executable
+chmod +x ~/.local/bin/hererocks
 
 # ---------- lazygit ----------
 if ! command -v lazygit >/dev/null 2>&1; then
