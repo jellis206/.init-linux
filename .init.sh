@@ -20,7 +20,7 @@ SUDO=""
 $SUDO apt-get update -y
 $SUDO apt-get install -y \
   zsh git curl unzip fzf zoxide ca-certificates ripgrep fd-find \
-  xclip libreadline-dev libncurses-dev build-essential clangd
+  xclip libreadline-dev libncurses-dev build-essential clangd python3-pip
 
 # ---------- default shell ----------
 if [[ "$(getent passwd "$USER" | cut -d: -f7)" != "/usr/bin/zsh" ]]; then
@@ -123,7 +123,7 @@ if command -v asdf >/dev/null 2>&1; then
   add_plugin lua https://github.com/Stratus3D/asdf-lua.git
 
   # Install latest versions & set global
-  for lang in nodejs golang; do
+  for lang in nodejs golang python; do
     latest="$(asdf latest "$lang" || true)"
     if [[ -n "$latest" ]]; then
       log "Installing $lang $latest"
