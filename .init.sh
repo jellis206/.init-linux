@@ -201,6 +201,9 @@ chmod +x ~/.local/bin/hererocks
 # Setup hererocks
 hererocks ~/.local/share/nvim/lazy-rocks/hererocks -l 5.1 -r latest -v
 
+sudo apt install -y texlive-full latext2text
+pip install pylatexenc
+
 # ---------- lazygit ----------
 if ! command -v lazygit >/dev/null 2>&1; then
   log "Installing lazygit via Go"
