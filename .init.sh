@@ -196,16 +196,14 @@ git clone git@github.com:jellis206/nvim.git "$NVIM_CONFIG"
 
 # Download hererocks directly from its GitHub
 curl -L https://raw.githubusercontent.com/mpeterv/hererocks/master/hererocks.py -o ~/.local/bin/hererocks
-# Make it executable
 chmod +x ~/.local/bin/hererocks
-# Setup hererocks
-hererocks ~/.local/share/nvim/lazy-rocks/hererocks -l 5.1 -r latest -v
+~/.local/bin/hererocks ~/.local/share/nvim/lazy-rocks/hererocks -l 5.1 -r latest -v
 
-sudo apt install -y texlive-full latext2text imagemagick ghostscript graphviz
-pip install pylatexenc
-pip install --upgrade pip pynvim
-npm install -g neovim
-npm install -g @mermaid-js/mermaid-cli
+sudo apt install -y texlive-full pipx imagemagick ghostscript graphviz
+sudo pipx install pylatexenc
+sudo pipx install pynvim
+sudo npm install -g neovim
+sudo npm install -g @mermaid-js/mermaid-cli
 
 # ---------- lazygit ----------
 if ! command -v lazygit >/dev/null 2>&1; then
