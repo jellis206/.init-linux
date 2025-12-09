@@ -266,7 +266,7 @@ post_install() {
   # Install Claude Code safely without sudo so it installs into asdf's node environment
   if ! command -v claude-code >/dev/null 2>&1; then
     log "Installing Claude Code via npm"
-    npm install -g claude-code || warn "Claude Code installation failed"
+    npm install -g @anthropic-ai/claude-code || warn "Claude Code installation failed"
   else
     log "Claude Code already installed"
   fi
