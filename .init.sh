@@ -231,14 +231,46 @@ else
   log "TPM already present at $TPM_DIR"
 fi
 
-# ---------- install Claude Code with npm ----------
-if ! command -v claude-code >/dev/null 2>&1; then
-  log "Installing Claude Code"
-  sudo npm install -g claude-code
-  log "Claude Code installed"
-else
-  log "Claude Code already installed"
-fi
+# ---------- Claude Code post-install integration ----------
+
+# Ensure asdf environment is sourced so node/npm are available
+ensure_asdf_env() {
+  # Prefer explicit ASDF_DATA_DIR install
+  if [[ -f "$ASDF_DATA_DIR/asdf.sh" ]]; then
+    . "$ASDF_DATA_DIR/asdf.sh"
+  elif [[ -f "$HOME/.asdf/asdf.sh" ]]; then
+    . "$HOME/.asdf/asdf.sh"
+  fi
+
+  # Ensure shims are exported
+  case ":$PATH:" in
+    *":$ASDF_DATA_DIR/shims:"*) ;;
+    *) export PATH="$ASDF_DATA_DIR/shims:$PATH" ;;
+  esac
+}
+
+post_install() {
+  log "Running post-install tasks"
+
+  ensure_asdf_env
+
+  # Check Node availability
+  if ! command -v node >/dev/null 2>&1; then
+    warn "Node is not available after asdf setup — skipping Claude Code install"
+    return
+  fi
+
+  log "Node version: $(node -v)"
+  log "npm version:  $(npm -v)"
+
+  # Install Claude Code safely without sudo so it installs into asdf's node environment
+  if ! command -v claude-code >/dev/null 2>&1; then
+    log "Installing Claude Code via npm"
+    npm install -g claude-code || warn "Claude Code installation failed"
+  else
+    log "Claude Code already installed"
+  fi
+}
 
 # ---------- overlay dotfiles ----------
 overlay_dotfiles() {
@@ -274,5 +306,8 @@ for entry in "$SCRIPT_DIR"/.* "$SCRIPT_DIR"/*; do
   esac
   overlay_dotfiles "$name"
 done
+
+# post-installation hook
+post_install
 
 log "All set. Open a new terminal or run: exec zsh"
