@@ -121,9 +121,10 @@ if command -v asdf >/dev/null 2>&1; then
   add_plugin python https://github.com/asdf-community/asdf-python.git
   add_plugin golang https://github.com/asdf-community/asdf-golang.git
   add_plugin lua https://github.com/Stratus3D/asdf-lua.git
+  add_plugin tree-sitter https://github.com/FabioAntunes/asdf-tree-sitter.git
 
   # Install latest versions & set global
-  for lang in nodejs golang python; do
+  for lang in nodejs golang python tree-sitter; do
     latest="$(asdf latest "$lang" || true)"
     if [[ -n "$latest" ]]; then
       log "Installing $lang $latest"
