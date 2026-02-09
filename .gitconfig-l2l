@@ -5,15 +5,15 @@
 	email = jay.ellis@l2l.com
 	signingkey = /home/jellis/.ssh/id_ed25519_l2l.pub
 
-; [url "git@github.com-l2l:"]
-; 	insteadOf = git@github.com:
-; [url "ssh://git@github.com-l2l/"]
-; 	insteadOf = https://github.com/
-; [url "git@gitlab.com-l2l:"]
-; 	insteadOf = git@gitlab.com:
-; [url "ssh://git@gitlab.com-l2l/"]
-; 	insteadOf = https://gitlab.com/
-; [url "git@bitbucket.org:"]
-; 	insteadOf = git@bitbucket.org:
-; [url "ssh://git@bitbucket.org/"]
-; 	insteadOf = https://bitbucket.org/
+[url "git@github.com-l2l:"]
+	insteadOf = git@github.com:
+[url "ssh://git@github.com-l2l/"]
+	insteadOf = https://github.com/
+[url "git@gitlab.com-l2l:"]
+	insteadOf = git@gitlab.com:
+[url "ssh://git@gitlab.com-l2l/"]
+	insteadOf = https://gitlab.com/
+[url "git@bitbucket.org:"]
+	insteadOf = git@bitbucket.org:
+[url "ssh://git@bitbucket.org/"]
+	insteadOf = https://bitbucket.org/

@@ -75,10 +75,10 @@
 ; 	insteadOf = git@gitlab.com:
 ; [url "ssh://git@gitlab.com/"]
 ; 	insteadOf = https://gitlab.com/
-; [url "git@bitbucket.org-pers:"]
-; 	insteadOf = git@bitbucket.org:
-; [url "ssh://git@bitbucket.org-pers/"]
-; 	insteadOf = https://bitbucket.org/
+[url "git@bitbucket.org-pers:"]
+	insteadOf = git@bitbucket.org:
+[url "ssh://git@bitbucket.org-pers/"]
+	insteadOf = https://bitbucket.org/
 
 # This must be last so L2L config overrides personal defaults
 [includeIf "gitdir:/home/jellis/dev/l2l/"]
